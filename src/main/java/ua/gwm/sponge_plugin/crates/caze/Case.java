@@ -1,14 +1,21 @@
 package ua.gwm.sponge_plugin.crates.caze;
 
+import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.entity.living.player.Player;
 
-public interface Case {
+public abstract class Case {
 
-    void add(Player player, int amount);
+    protected Case() {
+    }
 
-    int get(Player player);
+    public Case(ConfigurationNode node) {
+    }
 
-    default boolean canOpen(Player player) {
+    public abstract void add(Player player, int amount);
+
+    public abstract int get(Player player);
+
+    public boolean canOpen(Player player) {
         return true;
     }
 }

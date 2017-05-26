@@ -1,16 +1,16 @@
-package ua.gwm.sponge_plugin.crates.key.keys;
+package ua.gwm.sponge_plugin.crates.caze.cases;
 
 import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.entity.living.player.Player;
 import ua.gwm.sponge_plugin.crates.GWMCrates;
-import ua.gwm.sponge_plugin.crates.key.Key;
+import ua.gwm.sponge_plugin.crates.caze.Case;
 
-public class TimedKey extends Key {
+public class TimedCase extends Case {
 
     private String virtual_name;
     private int cooldown;
 
-    public TimedKey(ConfigurationNode node) {
+    public TimedCase(ConfigurationNode node) {
         ConfigurationNode virtual_name_node = node.getNode("VIRTUAL_NAME");
         ConfigurationNode cooldown_node = node.getNode("COOLDOWN");
         if (virtual_name_node.isVirtual()) {
@@ -23,7 +23,7 @@ public class TimedKey extends Key {
         cooldown = cooldown_node.getInt();
     }
 
-    public TimedKey(String virtual_name, int cooldown) {
+    public TimedCase(String virtual_name, int cooldown) {
         this.virtual_name = virtual_name;
         this.cooldown = cooldown;
     }

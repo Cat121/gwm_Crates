@@ -1,12 +1,21 @@
 package ua.gwm.sponge_plugin.crates.caze.cases;
 
+import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.entity.living.player.Player;
 import ua.gwm.sponge_plugin.crates.GWMCrates;
 import ua.gwm.sponge_plugin.crates.caze.Case;
 
-public class VirtualCase implements Case {
+public class VirtualCase extends Case {
 
     private String virtual_name;
+
+    public VirtualCase(ConfigurationNode node) {
+        ConfigurationNode virtual_name_node = node.getNode("VIRTUAL_NAME");
+        if (virtual_name_node.isVirtual()) {
+            throw new RuntimeException("VIRTUAL_NAME node does not exist!");
+        }
+        virtual_name = virtual_name_node.getString();
+    }
 
     public VirtualCase(String virtual_name) {
         this.virtual_name = virtual_name;

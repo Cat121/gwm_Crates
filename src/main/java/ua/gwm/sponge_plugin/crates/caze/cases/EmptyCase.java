@@ -1,9 +1,16 @@
 package ua.gwm.sponge_plugin.crates.caze.cases;
 
+import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.entity.living.player.Player;
 import ua.gwm.sponge_plugin.crates.caze.Case;
 
-public class EmptyCase implements Case {
+public class EmptyCase extends Case {
+
+    public EmptyCase(ConfigurationNode node) {
+    }
+
+    public EmptyCase() {
+    }
 
     @Override
     public void add(Player player, int amount) {

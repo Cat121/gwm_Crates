@@ -1,13 +1,23 @@
 package ua.gwm.sponge_plugin.crates.key.keys;
 
+import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import ua.gwm.sponge_plugin.crates.key.Key;
+import ua.gwm.sponge_plugin.crates.util.GWMCratesUtils;
 
-public class ItemKey implements Key {
+public class ItemKey extends Key {
 
     private ItemStack item;
+
+    public ItemKey(ConfigurationNode node) {
+        ConfigurationNode item_node = node.getNode("ITEM");
+        if (item_node.isVirtual()) {
+            throw new RuntimeException("ITEM node does not exist!");
+        }
+        item = GWMCratesUtils.parseItem(item_node);
+    }
 
     public ItemKey(ItemStack item) {
         this.item = item;

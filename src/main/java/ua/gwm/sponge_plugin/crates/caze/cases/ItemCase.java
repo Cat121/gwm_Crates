@@ -1,13 +1,23 @@
 package ua.gwm.sponge_plugin.crates.caze.cases;
 
+import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import ua.gwm.sponge_plugin.crates.caze.Case;
+import ua.gwm.sponge_plugin.crates.util.GWMCratesUtils;
 
-public class ItemCase implements Case {
+public class ItemCase extends Case {
 
     private ItemStack item;
+
+    public ItemCase(ConfigurationNode node) {
+        ConfigurationNode item_node = node.getNode("ITEM");
+        if (item_node.isVirtual()) {
+            throw new RuntimeException("ITEM node does not exist!");
+        }
+        item = GWMCratesUtils.parseItem(item_node);
+    }
 
     public ItemCase(ItemStack item) {
         this.item = item;

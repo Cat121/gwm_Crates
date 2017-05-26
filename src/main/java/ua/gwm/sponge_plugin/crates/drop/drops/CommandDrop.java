@@ -1,16 +1,30 @@
 package ua.gwm.sponge_plugin.crates.drop.drops;
 
+import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import ua.gwm.sponge_plugin.crates.drop.Drop;
+import ua.gwm.sponge_plugin.crates.util.GWMCratesUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Set;
 
-public class CommandDrop implements Drop {
+public class CommandDrop extends Drop {
 
-    private HashSet<Command> commands;
+    private Set<Command> commands;
+
+    public CommandDrop(ConfigurationNode node) {
+        ConfigurationNode commands_node = node.getNode("COMMANDS");
+        if (!commands_node.isVirtual()) {
+            throw new RuntimeException("COMMANDS node does not exist!");
+        }
+        commands = new HashSet<Command>();
+        for (ConfigurationNode command_node : commands_node.getChildrenList()) {
+            commands.add(GWMCratesUtils.parseCommand(command_node));
+        }
+    }
 
     public CommandDrop(Collection<Command> commands) {
         this.commands = new HashSet<Command>(commands);

@@ -23,7 +23,7 @@ public class Config {
     public Config(String name, boolean auto_save) {
         this.name = name;
         try {
-            file = new File(GWMCrates.getInstance().getConfigDirectory().toFile(), getName());
+            file = new File(GWMCrates.getInstance().getConfigDirectory(), getName());
             loader = HoconConfigurationLoader.builder().setFile(getFile()).build();
             node = getLoader().load();
             if (!getFile().exists()) {

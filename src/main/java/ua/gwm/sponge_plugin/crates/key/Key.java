@@ -1,10 +1,17 @@
 package ua.gwm.sponge_plugin.crates.key;
 
+import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.entity.living.player.Player;
 
-public interface Key {
+public abstract class Key {
 
-    void add(Player player, int amount);
+    protected Key() {
+    }
 
-    int get(Player player);
+    public Key(ConfigurationNode node) {
+    }
+
+    public abstract void add(Player player, int amount);
+
+    public abstract int get(Player player);
 }
