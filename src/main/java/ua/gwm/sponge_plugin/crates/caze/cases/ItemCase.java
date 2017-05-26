@@ -4,8 +4,12 @@ import ninja.leaping.configurate.ConfigurationNode;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.Slot;
 import ua.gwm.sponge_plugin.crates.caze.Case;
 import ua.gwm.sponge_plugin.crates.util.GWMCratesUtils;
+
+import java.util.Iterator;
+import java.util.Optional;
 
 public class ItemCase extends Case {
 
@@ -26,25 +30,54 @@ public class ItemCase extends Case {
     @Override
     public void add(Player player, int amount) {
         if (amount > 0) {
-            //TODO improve that algorithm.
             ItemStack copy = item.copy();
             copy.setQuantity(amount);
             player.getInventory().offer(copy);
         } else if (amount < 0) {
+            amount = -amount;
             Inventory inventory = player.getInventory();
-            //TODO write algorithm that deletes %amount% of %item% from %inventory%.
+            Iterator<Slot> slot_iterator = inventory.<Slot>slots().iterator();
+            while (amount > 0 && slot_iterator.hasNext()) {
+                Slot slot = slot_iterator.next();
+                Optional<ItemStack> optional_item = slot.peek();
+                if (optional_item.isPresent()) {
+                    ItemStack item = optional_item.get();
+                    if (GWMCratesUtils.itemStacksEquals(this.item, item)) {
+                        int item_quantity = item.getQuantity();
+                        if (item_quantity > amount) {
+                            item.setQuantity(item_quantity - amount);
+                            slot.set(item);
+                            amount = 0;
+                        } else {
+                            slot.set(ItemStack.empty());
+                            amount -= item_quantity;
+                        }
+                    }
+                }
+            }
         }
     }
 
     @Override
     public int get(Player player) {
+        int amout = 0;
         Inventory inventory = player.getInventory();
-        //TODO write algorithm that calculates amount of %item% in %inventory%
-        return 0;
+        Iterator<Slot> slot_iterator = inventory.<Slot>slots().iterator();
+        while (slot_iterator.hasNext()) {
+            Slot slot = slot_iterator.next();
+            Optional<ItemStack> optional_item = slot.peek();
+            if (optional_item.isPresent()) {
+                ItemStack item = optional_item.get();
+                if (GWMCratesUtils.itemStacksEquals(this.item, item)) {
+                    amout += item.getQuantity();
+                }
+            }
+        }
+        return amout;
     }
 
     public ItemStack getItem() {
-        return item;
+        return item.copy();
     }
 
     public void setItem(ItemStack item) {

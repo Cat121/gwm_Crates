@@ -12,4 +12,6 @@ public abstract class Drop {
     }
 
     public abstract void apply(Player player);
+
+    public abstract int getLevel();
 }

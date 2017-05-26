@@ -17,9 +17,26 @@ import ua.gwm.sponge_plugin.crates.drop.drops.CommandDrop;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class GWMCratesUtils {
+
+    public static boolean itemStacksEquals(ItemStack item, ItemStack other) {
+        ItemStack copy1 = item.copy();
+        ItemStack copy2 = other.copy();
+        copy1.setQuantity(1);
+        copy2.setQuantity(1);
+        return copy1.equalTo(copy2);
+    }
+
+    public static int getRandomIntLevel(int min, int max) {
+        Random random = new Random();
+        while (random.nextBoolean()) {
+            min++;
+        }
+        return min > max ? max : min;
+    }
 
     public static Location<World> parseLocation(ConfigurationNode node) {
         ConfigurationNode x_node = node.getNode("X");
@@ -60,9 +77,14 @@ public class GWMCratesUtils {
             ItemType item_type = item_type_node.getValue(TypeToken.of(ItemType.class));
             int quantity = quantity_node.getInt(1);
             ItemStack item = ItemStack.of(item_type, quantity);
+            ConfigurationNode durability_node = node.getNode("DURABILITY");
             ConfigurationNode display_name_node = node.getNode("DISPLAY_NAME");
             ConfigurationNode lore_node = node.getNode("LORE");
             ConfigurationNode enchantments_node = node.getNode("ENCHANTMENTS");
+            if (!durability_node.isVirtual()) {
+                int durability = durability_node.getInt();
+                item.offer(Keys.ITEM_DURABILITY, durability);
+            }
             if (!display_name_node.isVirtual()) {
                 Text display_name = TextSerializers.FORMATTING_CODE.deserialize(display_name_node.getString());
                 item.offer(Keys.DISPLAY_NAME, display_name);

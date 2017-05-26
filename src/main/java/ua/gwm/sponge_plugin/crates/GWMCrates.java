@@ -8,12 +8,16 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.StoneTypes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.game.state.GameConstructionEvent;
 import org.spongepowered.api.event.game.state.GameInitializationEvent;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import ua.gwm.sponge_plugin.crates.caze.Case;
@@ -28,6 +32,7 @@ import ua.gwm.sponge_plugin.crates.key.keys.EmptyKey;
 import ua.gwm.sponge_plugin.crates.key.keys.ItemKey;
 import ua.gwm.sponge_plugin.crates.key.keys.TimedKey;
 import ua.gwm.sponge_plugin.crates.key.keys.VirtualKey;
+import ua.gwm.sponge_plugin.crates.listener.ItemCaseListener;
 import ua.gwm.sponge_plugin.crates.manager.Manager;
 import ua.gwm.sponge_plugin.crates.open_manager.OpenManager;
 import ua.gwm.sponge_plugin.crates.open_manager.open_managers.FirstGuiOpenManager;
@@ -79,7 +84,6 @@ public class GWMCrates {
 
     private Config config;
     private Config language_config;
-    private Config managers_config;
     private Config virtual_cases_config;
     private Config virtual_keys_config;
     private Config timed_cases_cooldowns_config;
@@ -92,21 +96,27 @@ public class GWMCrates {
 
     @Listener
     public void onPreInitialization(GamePreInitializationEvent event) {
+        managers_directory = new File(config_directory, "managers");
         if (!config_directory.exists()) {
             try {
-                config_directory.createNewFile();
+                config_directory.mkdirs();
             } catch (Exception e) {
                 logger.warn("Failed creating config directory!", e);
             }
-            managers_directory = new File(config_directory, "managers");
-            if (!managers_directory.exists()) {
-                try {
-                    managers_directory.createNewFile();
-                } catch (Exception e) {
-                    logger.warn("Failed creating managers config directory!", e);
-                }
+        }
+        if (!managers_directory.exists()) {
+            try {
+                managers_directory.mkdirs();
+            } catch (Exception e) {
+                logger.warn("Failed creating managers config directory!", e);
             }
         }
+        config = new Config("config.conf", false);
+        language_config = new Config("language.conf", false);
+        virtual_cases_config = new Config("virtual_cases.conf", true);
+        virtual_keys_config = new Config("virtual_keys.conf", true);
+        timed_cases_cooldowns_config = new Config("timed_cases_cooldowns.conf", true);
+        timed_keys_cooldowns_config = new Config("timed_keys_cooldowns.conf", true);
         logger.info("PreInitialization complete!");
     }
 
@@ -118,6 +128,9 @@ public class GWMCrates {
     }
 
     private void register() {
+        ItemStack item = ItemStack.of(ItemTypes.STONE, 1);
+        item.offer(Keys.STONE_TYPE, StoneTypes.GRANITE);
+        Sponge.getEventManager().registerListeners(this, new ItemCaseListener());
         GWMCratesRegistrationEvent registration_event = new GWMCratesRegistrationEvent();
         registration_event.getCases().put("ITEM", ItemCase.class);
         registration_event.getCases().put("BLOCK", BlockCase.class);
@@ -131,7 +144,7 @@ public class GWMCrates {
         registration_event.getDrops().put("ITEM", ItemDrop.class);
         registration_event.getDrops().put("COMMAND", CommandDrop.class);
         registration_event.getDrops().put("MULTI", MultiDrop.class);
-        registration_event.getOpenManagers().put("NO_GUI", NoGuiOpenManager.class);
+        registration_event.getOpenManagers().put("NO-GUI", NoGuiOpenManager.class);
         registration_event.getOpenManagers().put("FIRST", FirstGuiOpenManager.class);
         registration_event.getOpenManagers().put("SECOND", SecondGuiOpenManager.class);
         Sponge.getEventManager().post(registration_event);
@@ -192,6 +205,9 @@ public class GWMCrates {
                     ConfigurationLoader<CommentedConfigurationNode> manager_configuration_loader =
                             HoconConfigurationLoader.builder().setFile(manager_file).build();
                     ConfigurationNode manager_node = manager_configuration_loader.load();
+                    Manager manager = new Manager(manager_node);
+                    created_managers.add(manager);
+                    logger.info("Manager \"" + manager.getName() + "\" successfully created!");
                 } catch (Exception e) {
                     logger.info("Exception creating manager " + manager_file.getName() + "!", e);
                 }
@@ -238,10 +254,6 @@ public class GWMCrates {
 
     public Cause getDefaultCause() {
         return default_cause;
-    }
-
-    public Config getManagersConfig() {
-        return managers_config;
     }
 
     public Config getVirtualCasesConfig() {

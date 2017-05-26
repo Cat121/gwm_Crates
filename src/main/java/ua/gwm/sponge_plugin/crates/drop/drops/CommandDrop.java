@@ -13,20 +13,24 @@ import java.util.Set;
 
 public class CommandDrop extends Drop {
 
+    private int level;
     private Set<Command> commands;
 
     public CommandDrop(ConfigurationNode node) {
+        ConfigurationNode level_node = node.getNode("LEVEL");
         ConfigurationNode commands_node = node.getNode("COMMANDS");
         if (!commands_node.isVirtual()) {
             throw new RuntimeException("COMMANDS node does not exist!");
         }
+        level = level_node.getInt(1);
         commands = new HashSet<Command>();
         for (ConfigurationNode command_node : commands_node.getChildrenList()) {
             commands.add(GWMCratesUtils.parseCommand(command_node));
         }
     }
 
-    public CommandDrop(Collection<Command> commands) {
+    public CommandDrop(int level, Collection<Command> commands) {
+        this.level = level;
         this.commands = new HashSet<Command>(commands);
     }
 
@@ -38,6 +42,11 @@ public class CommandDrop extends Drop {
             boolean console = command.isConsole();
             Sponge.getCommandManager().process(console ? console_source : player, cmd);
         }
+    }
+
+    @Override
+    public int getLevel() {
+        return level;
     }
 
     public static class Command {

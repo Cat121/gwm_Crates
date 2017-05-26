@@ -26,12 +26,13 @@ public class Config {
             file = new File(GWMCrates.getInstance().getConfigDirectory(), getName());
             loader = HoconConfigurationLoader.builder().setFile(getFile()).build();
             node = getLoader().load();
-            if (!getFile().exists()) {
-                getFile().createNewFile();
-                URL defaultsURL = GWMCrates.class.getResource("/" + getName());
+            if (!file.exists()) {
+                file.createNewFile();
+                URL defaultsURL = GWMCrates.class.getResource("/" + name);
                 ConfigurationLoader<CommentedConfigurationNode> defaultsLoader = HoconConfigurationLoader.builder().setURL(defaultsURL).build();
                 ConfigurationNode defaultsNode = defaultsLoader.load();
                 getNode().mergeValuesFrom(defaultsNode);
+                save();
             }
             if (auto_save) {
                 Sponge.getScheduler().createTaskBuilder().async().execute(this::save).

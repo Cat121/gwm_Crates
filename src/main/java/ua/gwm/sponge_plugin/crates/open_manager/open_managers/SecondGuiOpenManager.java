@@ -8,7 +8,9 @@ import ua.gwm.sponge_plugin.crates.open_manager.OpenManager;
 public class SecondGuiOpenManager extends OpenManager {
 
     public SecondGuiOpenManager(ConfigurationNode node) {
+    }
 
+    public SecondGuiOpenManager() {
     }
 
     @Override

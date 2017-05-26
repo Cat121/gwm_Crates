@@ -12,13 +12,16 @@ import java.util.Set;
 
 public class MultiDrop extends Drop {
 
+    private int level;
     private Set<Drop> drops;
 
     public MultiDrop(ConfigurationNode node) {
+        ConfigurationNode level_node = node.getNode("LEVEL");
         ConfigurationNode drops_node = node.getNode("DROPS");
         if (drops_node.isVirtual()) {
             throw new RuntimeException("DROPS node does not exist");
         }
+        level = level_node.getInt(1);
         for (ConfigurationNode drop_node : drops_node.getChildrenList()) {
             ConfigurationNode drop_type_node = drop_node.getNode("TYPE");
             if (drop_type_node.isVirtual()) {
@@ -39,12 +42,18 @@ public class MultiDrop extends Drop {
         }
     }
 
-    public MultiDrop(Collection<Drop> drops) {
+    public MultiDrop(int level, Collection<Drop> drops) {
+        this.level = level;
         this.drops = new HashSet<Drop>(drops);
     }
 
     @Override
     public void apply(Player player) {
         drops.forEach(drop -> drop.apply(player));
+    }
+
+    @Override
+    public int getLevel() {
+        return level;
     }
 }
